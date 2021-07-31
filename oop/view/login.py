@@ -27,7 +27,7 @@ class Login(Frame):
         parent.title("Login")
 
         lfUser = LabelFrame(parent, text="Inicio", font=fontFam2, fg=fg2, bg=bg)
-        lfUser.pack(padx=gap, pady=gap)
+        lfUser.grid(column=0, row= 0, columnspan= 2, padx=gap, pady=gap)
 
         labelUser = Label(lfUser, text="Usuario", font=fontFam1, fg=fg2, bg=bg)
         labelUser.grid(column=0, row=0, padx=gap, pady=gap)
@@ -44,10 +44,15 @@ class Login(Frame):
         self.labelVerif = Label(lfUser, text="", font=fontFam1, fg="#bb3e03", bg=bg)
         self.labelVerif.grid(column=0, row=2, columnspan=2, padx=gap, pady=gap)
 
-        self.__btnPrueba = Button(
+        self.__btnIngresar = Button(
             parent, text="Ingresar", font=fontFam1, fg="white", bg=fg1
         )
-        self.__btnPrueba.pack(padx=gap, pady=gap)
+        self.__btnIngresar.grid(column=0, row=1, padx=gap, pady=gap, sticky="WE")
+
+        self.__btnRegistrar = Button(
+            parent, text= "Nuevo", font=fontFam1, fg="white", bg=fg1
+        )
+        self.__btnRegistrar.grid(column=1, row=1, padx=gap, pady=gap, sticky="WE")
 
     @property
     def user(self) -> dict:
@@ -55,9 +60,17 @@ class Login(Frame):
         Getter de los datos del usuario
         """
         return {"Name": self.__txtUser.get(), "Pass": self.__txtPass.get()}
-
+    
     def message(self, text: str) -> None:
         self.labelVerif["text"] = text
 
-    def btnPruebaAction(self, accion) -> None:
-        self.__btnPrueba["command"] = accion
+    def accionBtnIngreso(self, accion) -> None:
+        self.__btnIngresar["command"]= accion
+
+    def accionBtnRegistro(self, accion) -> None:
+        self.__btnRegistrar["command"]=accion
+    
+     
+    
+
+    
