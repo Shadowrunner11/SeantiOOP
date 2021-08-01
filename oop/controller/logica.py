@@ -19,29 +19,31 @@ class Controller:
         self.__AppLogin.destroy()
 
     def __wrapper(self) -> None:
-        mensaje =  self.validarBas() if self.validarLen(self.__AppLogin.user) else "Campos vacios"
+        mensaje = (
+            self.validarBas()
+            if self.validarLen(self.__AppLogin.user)
+            else "Campos vacios"
+        )
 
         self.__AppLogin.message(mensaje)
 
     def validarBas(self) -> str:
         con = Conexion()
         dictio = self.__AppLogin.user
-        
+
         flag1 = con.buscarUser(dictio["Name"])
-        
+
         if flag1:
             flag2 = con.buscar(dictio)
             con.close()
-            return "Bienvenido" if flag2 else "Cotraseña incorrecta"  
-        
-        con.close() 
+            return "Bienvenido" if flag2 else "Cotraseña incorrecta"
+
+        con.close()
         return "No existe el usuario"
-        
-        
-    
+
     @staticmethod
     def validarLen(data: dict) -> bool:
-        
+
         return len(data["Name"]) and len(data["Pass"])
 
     @staticmethod
