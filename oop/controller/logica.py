@@ -1,4 +1,4 @@
-from bussines import Conexion
+from bussines import *
 from passlib.context import CryptContext
 from tkinter import Tk
 from view import login
@@ -15,6 +15,7 @@ class Controller:
         RootLogin = Tk()
         self.__AppLogin = login.Login(parent=RootLogin)
         self.__AppLogin.accionBtnIngreso(self.__wrapper)
+        self.__AppLogin.accionBtnRegNew(self.___wrapper2)
         self.__AppLogin.mainloop()
         self.__AppLogin.destroy()
 
@@ -27,24 +28,36 @@ class Controller:
 
         self.__AppLogin.message(mensaje)
 
+    def ___wrapper2(self) -> None:
+        dictio = self.__AppLogin.newUser
+        mensaje = "Campos incompletos"
+        if self.validarLen(dictio):
+            mensaje = (
+                createUser(dictio["Name"], dictio["Pass"])
+                if self.validarNew()
+                else "No coinciden las contraseñas"
+            )
+
+        self.__AppLogin.message(mensaje)
+
     def validarBas(self) -> str:
-        con = Conexion()
+
         dictio = self.__AppLogin.user
+        return validar(dictio["Name"], dictio["Pass"])
 
-        flag1 = con.buscarUser(dictio["Name"])
+    def validarNew(self) -> bool:
+        dictio = self.__AppLogin.newUser
+        flag = self.validarLen(dictio)
 
-        if flag1:
-            flag2 = con.buscar(dictio)
-            con.close()
-            return "Bienvenido" if flag2 else "Cotraseña incorrecta"
-
-        con.close()
-        return "No existe el usuario"
+        return dictio["Pass"] == dictio["NPass"]
 
     @staticmethod
-    def validarLen(data: dict) -> bool:
+    def validarLen(karg: dict) -> bool:
+        flag = True
+        for value in karg.values():
+            flag = len(value) > 0
 
-        return len(data["Name"]) and len(data["Pass"])
+        return flag
 
     @staticmethod
     def encryptarPass(password: str) -> str:
