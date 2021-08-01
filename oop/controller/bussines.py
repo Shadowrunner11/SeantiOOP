@@ -26,7 +26,6 @@ class Conexion:
     def __del__(self):
         print("Conexion destruida")
 
-
 def create(tabla: str, first, *arg):
     values = f"'{first}'" if type(first) == str else f"{first}"
     for i in arg:

@@ -189,3 +189,49 @@ class Login(Frame):
         self.__btnRegresar.grid_remove()
         self.__btnIngresar.grid()
         self.__btnRegistrar.grid()
+
+class PointSale(Frame):
+    def __init__(self, parent=None):
+        super(PointSale, self).__init__(parent)
+        self.parentIn = parent
+        self.__iniciar(self.parentIn, "Iniciando")
+
+    def __iniciar(self, parent: Tk, debuggerMessage: str) -> None:
+        """
+        Introducimos los widgets a la ventana principal
+        """
+        print(debuggerMessage)
+        self.gap = 8
+        self.bg = "#101010"
+        self.fg1 = "#003566"
+        self.fg2 = "#fff"
+        self.fontFam1 = Font(family="Tahoma", size=17, weight="bold")
+        self.fontFam2 = Font(family="Arial", size=15)
+
+        parent.configure(bg=self.bg)
+        parent.title("Login")
+
+        
+
+        self.__lfUser = LabelFrame(
+            parent, text="Inicio", font=self.fontFam2, fg=self.fg2, bg=self.bg
+        )
+        self.__lfUser.grid(column=0, row=1, columnspan=2, padx=self.gap, pady=self.gap)
+
+        self.labelUser = Label(
+            self.__lfUser, text="Usuario", font=self.fontFam1, fg=self.fg2, bg=self.bg
+        )
+        self.labelUser.grid(column=0, row=0, padx=self.gap, pady=self.gap)
+
+        self.__txtUser = Entry(
+            self.__lfUser, text="Ingrese su usuario", font=self.fontFam1
+        )
+        self.__txtUser.grid(column=1, row=0, padx=self.gap, pady=self.gap)
+
+        self.labelContra = Label(
+            self.__lfUser,
+            text="Contraseña",
+            font=self.fontFam1,
+            fg=self.fg2,
+            bg=self.bg,
+        )
