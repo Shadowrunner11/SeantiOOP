@@ -12,7 +12,6 @@ pwd_context = CryptContext(
 
 class Controller:
     def __init__(self):
-        
         self.RootLogin = Tk()
         self.__AppLogin = login.Login(parent=self.RootLogin)
         self.__AppLogin.accionBtnIngreso(self.__wrapper)
@@ -21,7 +20,6 @@ class Controller:
         self.__AppLogin.destroy()
 
     def __wrapper(self) -> None:
-        
         mensaje = (
             self.validarBas()
             if self.validarLen(self.__AppLogin.user)
@@ -29,7 +27,7 @@ class Controller:
         )
 
         self.__AppLogin.message(mensaje)
-        if mensaje =="Ingresando":
+        if mensaje == "Ingresando":
             self.RootLogin.destroy()
             Controller2()
 
@@ -64,13 +62,15 @@ class Controller:
     @staticmethod
     def encryptarPass(password: str) -> str:
         return pwd_context.encrypt(password)
-        
+
+
 class Controller2:
     def __init__(self):
-            
+
         self.RootLogin = Tk()
         self.__AppLogin = login.PointSale(parent=self.RootLogin)
         self.__AppLogin.mainloop()
         self.__AppLogin.destroy()
+
 
 controler = Controller()
