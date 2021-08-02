@@ -60,6 +60,9 @@ def read(tabla):
     query = f"SELECT * FROM {tabla}"
     return Conexion().start(query).resultado
 
+def readProductos():
+    return read("productos")
+
 
 def searchUser(name: str) -> 1 or 0:
     query = f"SELECT EXISTS (SELECT 1 FROM usuario WHERE nombre='{name}')"

@@ -66,9 +66,9 @@ class Controller:
 
 class Controller2:
     def __init__(self):
-
         self.RootLogin = Tk()
         self.__AppLogin = login.PointSale(parent=self.RootLogin)
+        self.__AppLogin.actualizar(readProductos())
         self.__AppLogin.mainloop()
         self.__AppLogin.destroy()
 

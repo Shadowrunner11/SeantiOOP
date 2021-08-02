@@ -1,5 +1,7 @@
 from tkinter import *
 from tkinter.font import Font
+from tkinter import ttk
+from typing import ItemsView
 
 
 class Login(Frame):
@@ -29,10 +31,25 @@ class Login(Frame):
         self.toggleTheme = Button(parent, command=self.cambiarColor)
         self.toggleTheme.grid(column=0, row=0, sticky="W", padx=self.gap, pady=self.gap)
 
+        mode = IntVar()
+
+        """
+        self.labelSelect = Label(parent, bg=self.bg)
+        self.labelSelect.grid(column=1, row=0)
+
+        self.radioVender = Radiobutton(self.labelSelect, variable=mode, value =1, text="Vendedor", bg=self.bg, fg=self.fg2)
+        self.radioVender.grid(column=0, row =0)
+
+        self.radioAdmin = Radiobutton(self.labelSelect, variable=mode, value = 2, text= "Admin", bg=self.bg, fg=self.fg2)
+        self.radioAdmin.grid(column=1, row= 0)
+
+        """
         self.__lfUser = LabelFrame(
             parent, text="Inicio", font=self.fontFam2, fg=self.fg2, bg=self.bg
         )
         self.__lfUser.grid(column=0, row=1, columnspan=2, padx=self.gap, pady=self.gap)
+
+
 
         self.labelUser = Label(
             self.__lfUser, text="Usuario", font=self.fontFam1, fg=self.fg2, bg=self.bg
@@ -103,6 +120,7 @@ class Login(Frame):
             self.labelUser,
             self.__lfUser,
             self.labelContra,
+            
         ]
         self.listabtn = [
             self.__btnRegisNew,
@@ -115,6 +133,7 @@ class Login(Frame):
             self.labelUser,
             self.labelUser,
             self.__lfUser,
+            
         ]
 
     @property
@@ -208,30 +227,66 @@ class PointSale(Frame):
         self.fontFam1 = Font(family="Tahoma", size=17, weight="bold")
         self.fontFam2 = Font(family="Arial", size=15)
 
-        parent.configure(bg=self.bg)
-        parent.title("Login")
+        #parent.configure(bg=self.bg)
+        parent.title("Teletubies SAC")
 
+        self.frVender = Frame(parent)
+        self.frVender.pack(side="left", fill=BOTH)
+
+        self.lblFrBuscar = LabelFrame(self.frVender, text="Buscar")
+        self.lblFrBuscar.pack()
+        
+        
+        self.lblFiltro =Label(self.lblFrBuscar, text="Filtrar")
+        self.lblFiltro.grid(column=0,row=0, sticky="w")
+        
+        self.filtro =IntVar()
+        self.radioNombre = Radiobutton(self.lblFrBuscar, text ="Nombre", variable=self.filtro, value = 1)
+        self.radioNombre.grid(column=0, row=1, sticky="w")
+
+        self.radioId = Radiobutton(self.lblFrBuscar, text="Codigo", variable=self.filtro, value=2)
+        self.radioId.grid(column=1, row=1)
+       
+        
+        #self.lblProduct = Label(self.lblFrBuscar, text="Producto")
+        #self.lblProduct.grid(column=0, row=0)
+
+        self.txtProduct = Entry(self.lblFrBuscar)
+        self.txtProduct.grid(column=0, row=2, columnspan=2, sticky="we")
+
+        self.btnSearch = Button(self.lblFrBuscar)
+        self.btnSearch.grid(column=2, row =2)
+
+        self.frAdd = LabelFrame(self.frVender, text="cantidad")
+        self.frAdd.pack(expand=1)
+
+        self.txtAdd = Entry(self.frAdd)
+        self.txtAdd.grid(column=0, row=0)
+
+        self.btnAdd =Button(self.frAdd)
+        self.btnAdd.grid(column=1, row=0)
+
+        self.treeBoleta = ttk.Treeview(self.frVender)
+        self.treeBoleta.pack(fill=BOTH)
+
+        self.frOpciones = Frame(self.frVender)
+        self.frOpciones.pack(expand=1)
+
+        self.btnAceptar = Button(self.frOpciones, text="ACEPTAR")
+        self.btnAceptar.grid(column=0, row =0, sticky=W+E)
+
+        self.btnCancel = Button(self.frOpciones, text="CANCELAR")
+        self.btnCancel.grid(column=1, row =0, sticky=W+E)
+
+        self.treeCatalogo = ttk.Treeview(parent, columns=["0", "1", "2", "3"])
+        self.treeCatalogo.pack(expand=1, fill=BOTH)
+        
+    def actualizar(self, datos):
+        cant = len(datos)
+        for i in range(cant):
+            item=self.treeCatalogo.insert("",i,text=datos[i][0])
+            for j in range(4):
+                self.treeCatalogo.set(item, f"{j}", f"{datos[i][j+1]}")
         
 
-        self.__lfUser = LabelFrame(
-            parent, text="Inicio", font=self.fontFam2, fg=self.fg2, bg=self.bg
-        )
-        self.__lfUser.grid(column=0, row=1, columnspan=2, padx=self.gap, pady=self.gap)
-
-        self.labelUser = Label(
-            self.__lfUser, text="Usuario", font=self.fontFam1, fg=self.fg2, bg=self.bg
-        )
-        self.labelUser.grid(column=0, row=0, padx=self.gap, pady=self.gap)
-
-        self.__txtUser = Entry(
-            self.__lfUser, text="Ingrese su usuario", font=self.fontFam1
-        )
-        self.__txtUser.grid(column=1, row=0, padx=self.gap, pady=self.gap)
-
-        self.labelContra = Label(
-            self.__lfUser,
-            text="Contraseña",
-            font=self.fontFam1,
-            fg=self.fg2,
-            bg=self.bg,
-        )
+        
