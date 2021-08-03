@@ -7,12 +7,12 @@ from typing import ItemsView
 class Login(Frame):
     cont = 0
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, lite=True):
         super(Login, self).__init__(parent)
         self.parentIn = parent
-        self.__iniciar(self.parentIn, "Iniciando")
+        self.__iniciar(self.parentIn, "Iniciando", lite)
 
-    def __iniciar(self, parent: Tk, debuggerMessage: str) -> None:
+    def __iniciar(self, parent: Tk, debuggerMessage: str, lite=True) -> None:
         """
         Introducimos los widgets a la ventana principal
         """
@@ -25,41 +25,41 @@ class Login(Frame):
         self.fontFam1 = Font(family="Tahoma", size=17, weight="bold")
         self.fontFam2 = Font(family="Arial", size=15)
 
-        parent.configure(bg=self.bg)
-        parent.title("Login")
+        if lite == True:
+            parent.title("Login")
+            self.toggleTheme = Button(parent, command=self.cambiarColor)
+            self.toggleTheme.grid(
+                column=0, row=0, sticky="W", padx=self.gap, pady=self.gap
+            )
 
-        self.toggleTheme = Button(parent, command=self.cambiarColor)
-        self.toggleTheme.grid(column=0, row=0, sticky="W", padx=self.gap, pady=self.gap)
+        if lite != True:
+            self.gap = 2
+            self.bg = "#e1e1e1"
+            self.fg1 = "#000"
+            self.fg2 = "#000"
+            self.fontFam1 = Font(family="Arial", size=10)
+            self.fontFam2 = Font(family="Arial", size=10)
+
+        parent.configure(bg=self.bg)
 
         mode = IntVar()
 
-        """
-        self.labelSelect = Label(parent, bg=self.bg)
-        self.labelSelect.grid(column=1, row=0)
-
-        self.radioVender = Radiobutton(self.labelSelect, variable=mode, value =1, text="Vendedor", bg=self.bg, fg=self.fg2)
-        self.radioVender.grid(column=0, row =0)
-
-        self.radioAdmin = Radiobutton(self.labelSelect, variable=mode, value = 2, text= "Admin", bg=self.bg, fg=self.fg2)
-        self.radioAdmin.grid(column=1, row= 0)
-
-        """
         self.__lfUser = LabelFrame(
             parent, text="Inicio", font=self.fontFam2, fg=self.fg2, bg=self.bg
         )
+        if lite == False:
+            self.__lfUser["text"] = "Admin"
         self.__lfUser.grid(column=0, row=1, columnspan=2, padx=self.gap, pady=self.gap)
-
-
 
         self.labelUser = Label(
             self.__lfUser, text="Usuario", font=self.fontFam1, fg=self.fg2, bg=self.bg
         )
         self.labelUser.grid(column=0, row=0, padx=self.gap, pady=self.gap)
 
-        self.__txtUser = Entry(
+        self.txtUser = Entry(
             self.__lfUser, text="Ingrese su usuario", font=self.fontFam1
         )
-        self.__txtUser.grid(column=1, row=0, padx=self.gap, pady=self.gap)
+        self.txtUser.grid(column=1, row=0, padx=self.gap, pady=self.gap)
 
         self.labelContra = Label(
             self.__lfUser,
@@ -70,8 +70,8 @@ class Login(Frame):
         )
         self.labelContra.grid(column=0, row=1, padx=self.gap, pady=self.gap)
 
-        self.__txtPass = Entry(self.__lfUser, show="*", font=self.fontFam1)
-        self.__txtPass.grid(column=1, row=1, padx=self.gap, pady=self.gap)
+        self.txtPass = Entry(self.__lfUser, show="*", font=self.fontFam1)
+        self.txtPass.grid(column=1, row=1, padx=self.gap, pady=self.gap)
 
         self.labelVerif = Label(
             self.__lfUser, text="", font=self.fontFam1, fg="#bb3e03", bg=self.bg
@@ -83,9 +83,25 @@ class Login(Frame):
         self.__btnIngresar = Button(
             parent, text="Ingresar", font=self.fontFam1, fg="white", bg=self.fg1
         )
+
         self.__btnIngresar.grid(
             column=0, row=2, padx=self.gap, pady=self.gap, sticky="WE"
         )
+
+        self.btnBloquear = Button(
+            parent,
+            text="Bloquear",
+            font=self.fontFam1,
+            bg=self.bg,
+            fg=self.fg2,
+            state=DISABLED,
+        )
+        if lite == False:
+            self.__btnIngresar.configure(text="Permiso", bg=self.bg, fg=self.fg2)
+            self.__btnIngresar.grid_configure(columnspan=2)
+            self.btnBloquear.grid(
+                column=0, row=3, columnspan=2, padx=self.gap, pady=self.gap, sticky="WE"
+            )
 
         self.__btnRegistrar = Button(
             parent,
@@ -95,9 +111,11 @@ class Login(Frame):
             bg=self.fg1,
             command=self.accionBtnRegistro,
         )
-        self.__btnRegistrar.grid(
-            column=1, row=2, padx=self.gap, pady=self.gap, sticky="WE"
-        )
+
+        if lite == True:
+            self.__btnRegistrar.grid(
+                column=1, row=2, padx=self.gap, pady=self.gap, sticky="WE"
+            )
 
         self.__btnRegisNew = Button(
             parent,
@@ -120,7 +138,6 @@ class Login(Frame):
             self.labelUser,
             self.__lfUser,
             self.labelContra,
-            
         ]
         self.listabtn = [
             self.__btnRegisNew,
@@ -133,7 +150,6 @@ class Login(Frame):
             self.labelUser,
             self.labelUser,
             self.__lfUser,
-            
         ]
 
     @property
@@ -141,15 +157,17 @@ class Login(Frame):
         """
         Getter de los datos del usuario
         """
-        return {"Name": self.__txtUser.get(), "Pass": self.__txtPass.get()}
+        return {"Name": self.txtUser.get(), "Pass": self.txtPass.get()}
 
     @property
     def newUser(self) -> dict:
         return {
-            "Name": self.__txtUser.get(),
-            "Pass": self.__txtPass.get(),
+            "Name": self.txtUser.get(),
+            "Pass": self.txtPass.get(),
             "NPass": self.__txtPass2.get(),
         }
+    def accionBtnBloq(self,accion):
+        self.btnBloquear["command"]=accion
 
     def message(self, text: str) -> None:
         self.labelVerif["text"] = text
@@ -209,6 +227,7 @@ class Login(Frame):
         self.__btnIngresar.grid()
         self.__btnRegistrar.grid()
 
+
 class PointSale(Frame):
     def __init__(self, parent=None):
         super(PointSale, self).__init__(parent)
@@ -227,7 +246,7 @@ class PointSale(Frame):
         self.fontFam1 = Font(family="Tahoma", size=17, weight="bold")
         self.fontFam2 = Font(family="Arial", size=15)
 
-        #parent.configure(bg=self.bg)
+        # parent.configure(bg=self.bg)
         parent.title("Teletubies SAC")
 
         self.frVender = Frame(parent)
@@ -235,58 +254,138 @@ class PointSale(Frame):
 
         self.lblFrBuscar = LabelFrame(self.frVender, text="Buscar")
         self.lblFrBuscar.pack()
-        
-        
-        self.lblFiltro =Label(self.lblFrBuscar, text="Filtrar")
-        self.lblFiltro.grid(column=0,row=0, sticky="w")
-        
-        self.filtro =IntVar()
-        self.radioNombre = Radiobutton(self.lblFrBuscar, text ="Nombre", variable=self.filtro, value = 1)
+
+        self.lblFiltro = Label(self.lblFrBuscar, text="Filtrar")
+        self.lblFiltro.grid(column=0, row=0, sticky="w")
+
+        self.filtro = IntVar(None, 1)
+        self.radioNombre = Radiobutton(
+            self.lblFrBuscar, text="Nombre", variable=self.filtro, value=1
+        )
         self.radioNombre.grid(column=0, row=1, sticky="w")
 
-        self.radioId = Radiobutton(self.lblFrBuscar, text="Codigo", variable=self.filtro, value=2)
+        self.radioId = Radiobutton(
+            self.lblFrBuscar, text="Codigo", variable=self.filtro, value=2
+        )
         self.radioId.grid(column=1, row=1)
-       
-        
-        #self.lblProduct = Label(self.lblFrBuscar, text="Producto")
-        #self.lblProduct.grid(column=0, row=0)
 
-        self.txtProduct = Entry(self.lblFrBuscar)
+        # self.lblProduct = Label(self.lblFrBuscar, text="Producto")
+        # self.lblProduct.grid(column=0, row=0)
+        self.textProduct = StringVar()
+        # self.textProduct.trace("w", lambda x, y, z:print(textProduct.get()) )
+
+        self.txtProduct = Entry(self.lblFrBuscar, textvariable=self.textProduct)
         self.txtProduct.grid(column=0, row=2, columnspan=2, sticky="we")
-
-        self.btnSearch = Button(self.lblFrBuscar)
-        self.btnSearch.grid(column=2, row =2)
 
         self.frAdd = LabelFrame(self.frVender, text="cantidad")
         self.frAdd.pack(expand=1)
 
-        self.txtAdd = Entry(self.frAdd)
+        self.cantidad = IntVar(None,1)
+
+        self.txtAdd = Entry(self.frAdd, textvariable=self.cantidad)
         self.txtAdd.grid(column=0, row=0)
 
-        self.btnAdd =Button(self.frAdd)
+        self.btnAdd = Button(self.frAdd)
         self.btnAdd.grid(column=1, row=0)
 
-        self.treeBoleta = ttk.Treeview(self.frVender)
-        self.treeBoleta.pack(fill=BOTH)
+        self.treeBoleta = ttk.Treeview(self.frVender, columns=["0", "1"])
+        
+        self.treeBoleta.column("#0", width=180)
+        self.treeBoleta.column("#1", width=60)
+        self.treeBoleta.column("#2", width=60)
+        self.treeBoleta.pack(fill=Y)
 
         self.frOpciones = Frame(self.frVender)
         self.frOpciones.pack(expand=1)
 
-        self.btnAceptar = Button(self.frOpciones, text="ACEPTAR")
-        self.btnAceptar.grid(column=0, row =0, sticky=W+E)
+        self.btnAceptar = Button(self.frOpciones, text="VENTA")
+        self.btnAceptar.grid(column=0, row=0, sticky=W + E)
 
         self.btnCancel = Button(self.frOpciones, text="CANCELAR")
-        self.btnCancel.grid(column=1, row =0, sticky=W+E)
+        self.btnCancel.grid(column=1, row=0, sticky=W + E)
+
+        self.btnAlm = Button(self.frOpciones, text="ALMACEN", state="disabled")
+        self.btnAlm.grid(column=0, row=1, sticky=W + E)
+
+        self.btnDevol = Button(self.frOpciones, text="DEVOLUCION", state="disabled")
+        self.btnDevol.grid(column=1, row=1, sticky=W + E)
+
+        self.frAdmin = Frame(self.frVender)
+        self.frAdmin.pack()
+
+        self.login = Login(self.frAdmin, False)
+        self.login.grid(column=0, row=0, columnspan=2)
 
         self.treeCatalogo = ttk.Treeview(parent, columns=["0", "1", "2", "3"])
         self.treeCatalogo.pack(expand=1, fill=BOTH)
-        
-    def actualizar(self, datos):
+
+        self.frNuevo = Frame(parent)
+        self.frNuevo.pack(side="bottom")
+
+        self.nombreProd = StringVar()
+        self.lblNombreProd = Label(self.frNuevo, text="Nombre")
+        self.txtNombreProd = Entry(self.frNuevo, state="disabled", textvariable=self.nombreProd)
+
+        self.precioProd = DoubleVar()
+        self.lblPrecioProd = Label(self.frNuevo, text="Precio")        
+        self.txtPrecioProd = Entry(self.frNuevo, state="disabled", textvariable=self.precioProd)
+
+        self.cantidadProd = IntVar()
+        self.lblCantidadProd = Label(self.frNuevo, text="Cantidad")
+        self.txtCantidadProd = Entry(self.frNuevo, state="disabled", textvariable=self.cantidadProd)
+
+        self.desProd = StringVar()
+        self.lblDesProd = Label(self.frNuevo, text="Descripcion")
+        self.txtDesProd = Entry(self.frNuevo, state="disabled", textvariable= self.desProd)
+
+        listaNuevo = [
+            self.lblNombreProd,
+            self.lblPrecioProd,
+            self.lblCantidadProd,
+            self.lblDesProd,
+        ]
+
+        listaNuevo2 = [
+            self.txtNombreProd,
+            self.txtPrecioProd,
+            self.txtCantidadProd,
+            self.txtDesProd,
+        ]
+
+        for i in range(len(listaNuevo)):
+
+            listaNuevo[i].grid(column=i, row=0, padx=self.gap, pady=self.gap)
+
+            listaNuevo2[i].grid(column=i, row=1, padx=self.gap, pady=(0, self.gap))
+
+        self.btnNuevo = Button(self.frNuevo, text="Add", state="disabled")
+        self.btnNuevo.grid(column=4, row=0, rowspan=2)
+
+    def actualizar(self, datos: list, tabla: ttk.Treeview) -> None:
         cant = len(datos)
         for i in range(cant):
-            item=self.treeCatalogo.insert("",i,text=datos[i][0])
-            for j in range(4):
-                self.treeCatalogo.set(item, f"{j}", f"{datos[i][j+1]}")
-        
+            item = tabla.insert("", i, text=datos[i][0])
+            for j in range(len(datos[0])-1):
+                tabla.set(item, f"{j}", f"{datos[i][j+1]}")
 
-        
+    def borrar(self, tabla):
+        tabla.delete(*tabla.get_children())
+
+    
+    def getTablaSeleccion(self, tabla: ttk.Treeview):
+        return tabla.selection()
+    
+    def addCommandAdd(self, function):
+        self.btnAdd["command"]=function
+
+    def addCommandCancel(self, function):
+        self.btnCancel["command"]=function
+
+    def addCommandNuevo(self, function):
+        self.btnNuevo["command"]=function
+
+    def addCommandVenta(self, function):
+        self.btnAceptar["command"]=function
+    def addCommandAlm(self, function):
+        self.btnAlm["command"]=function
+    
