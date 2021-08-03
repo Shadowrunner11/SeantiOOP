@@ -190,5 +190,5 @@ class Controller2:
             print("No se registro prodcuto")
         self.search("")
 
-
-controler = Controller2()
+if __name__=="__main__":
+    controler = Controller().start()
