@@ -119,6 +119,7 @@ class Controller2:
 
         self.__AppLogin.borrar(self.__boleta)
         self.__AppLogin.actualizar(self.datos, self.__boleta)
+        self.__AppLogin.cantidad.set(1)
 
     def cancel(self):
         self.__AppLogin.borrar(self.__boleta)
@@ -185,6 +186,11 @@ class Controller2:
             nombre = self.__AppLogin.nombreProd.get()
 
             creatProduct(nombre, precio, cantidad, des)
+            self.__AppLogin.cantidadProd.set(0)
+           
+            self.__AppLogin.desProd.set("")
+            self.__AppLogin.precioProd.set(0)
+            self.__AppLogin.nombreProd.set("")
 
         except:
             print("No se registro prodcuto")
