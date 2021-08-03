@@ -166,8 +166,9 @@ class Login(Frame):
             "Pass": self.txtPass.get(),
             "NPass": self.__txtPass2.get(),
         }
-    def accionBtnBloq(self,accion):
-        self.btnBloquear["command"]=accion
+
+    def accionBtnBloq(self, accion):
+        self.btnBloquear["command"] = accion
 
     def message(self, text: str) -> None:
         self.labelVerif["text"] = text
@@ -280,7 +281,7 @@ class PointSale(Frame):
         self.frAdd = LabelFrame(self.frVender, text="cantidad")
         self.frAdd.pack(expand=1)
 
-        self.cantidad = IntVar(None,1)
+        self.cantidad = IntVar(None, 1)
 
         self.txtAdd = Entry(self.frAdd, textvariable=self.cantidad)
         self.txtAdd.grid(column=0, row=0)
@@ -289,7 +290,7 @@ class PointSale(Frame):
         self.btnAdd.grid(column=1, row=0)
 
         self.treeBoleta = ttk.Treeview(self.frVender, columns=["0", "1"])
-        
+
         self.treeBoleta.column("#0", width=180)
         self.treeBoleta.column("#1", width=60)
         self.treeBoleta.column("#2", width=60)
@@ -324,19 +325,27 @@ class PointSale(Frame):
 
         self.nombreProd = StringVar()
         self.lblNombreProd = Label(self.frNuevo, text="Nombre")
-        self.txtNombreProd = Entry(self.frNuevo, state="disabled", textvariable=self.nombreProd)
+        self.txtNombreProd = Entry(
+            self.frNuevo, state="disabled", textvariable=self.nombreProd
+        )
 
         self.precioProd = DoubleVar()
-        self.lblPrecioProd = Label(self.frNuevo, text="Precio")        
-        self.txtPrecioProd = Entry(self.frNuevo, state="disabled", textvariable=self.precioProd)
+        self.lblPrecioProd = Label(self.frNuevo, text="Precio")
+        self.txtPrecioProd = Entry(
+            self.frNuevo, state="disabled", textvariable=self.precioProd
+        )
 
         self.cantidadProd = IntVar()
         self.lblCantidadProd = Label(self.frNuevo, text="Cantidad")
-        self.txtCantidadProd = Entry(self.frNuevo, state="disabled", textvariable=self.cantidadProd)
+        self.txtCantidadProd = Entry(
+            self.frNuevo, state="disabled", textvariable=self.cantidadProd
+        )
 
         self.desProd = StringVar()
         self.lblDesProd = Label(self.frNuevo, text="Descripcion")
-        self.txtDesProd = Entry(self.frNuevo, state="disabled", textvariable= self.desProd)
+        self.txtDesProd = Entry(
+            self.frNuevo, state="disabled", textvariable=self.desProd
+        )
 
         listaNuevo = [
             self.lblNombreProd,
@@ -365,27 +374,26 @@ class PointSale(Frame):
         cant = len(datos)
         for i in range(cant):
             item = tabla.insert("", i, text=datos[i][0])
-            for j in range(len(datos[0])-1):
+            for j in range(len(datos[0]) - 1):
                 tabla.set(item, f"{j}", f"{datos[i][j+1]}")
 
     def borrar(self, tabla):
         tabla.delete(*tabla.get_children())
 
-    
     def getTablaSeleccion(self, tabla: ttk.Treeview):
         return tabla.selection()
-    
+
     def addCommandAdd(self, function):
-        self.btnAdd["command"]=function
+        self.btnAdd["command"] = function
 
     def addCommandCancel(self, function):
-        self.btnCancel["command"]=function
+        self.btnCancel["command"] = function
 
     def addCommandNuevo(self, function):
-        self.btnNuevo["command"]=function
+        self.btnNuevo["command"] = function
 
     def addCommandVenta(self, function):
-        self.btnAceptar["command"]=function
+        self.btnAceptar["command"] = function
+
     def addCommandAlm(self, function):
-        self.btnAlm["command"]=function
-    
+        self.btnAlm["command"] = function
