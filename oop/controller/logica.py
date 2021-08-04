@@ -1,3 +1,4 @@
+import re
 from bussines import *
 from passlib.context import CryptContext
 from tkinter import Tk
@@ -11,7 +12,8 @@ pwd_context = CryptContext(
 
 
 class Controller:
-    def __init__(self):
+    def __init__(self, lite=True):
+        
         print("Inicio")
 
     def start(self):
@@ -22,20 +24,25 @@ class Controller:
         self.__AppLogin.mainloop()
         self.__AppLogin.destroy()
 
+    def conect(self, login:login.Login):
+        self.__AppLogin=login
+        self.__AppLogin.accionBtnIngreso(self.__wrapper)
+        
+
     def __wrapper(self) -> None:
         mensaje = (
             self.validarBas()
-            if self.validarLen(self.__AppLogin.user)
+            if self.validarLen(self.correctInfo(self.__AppLogin.user))
             else "Campos vacios"
         )
-
+        self.__AppLogin.passw.set("")
         self.__AppLogin.message(mensaje)
         if mensaje == "Ingresando":
             self.RootLogin.destroy()
-            Controller2()
+            Controller2(self.__AppLogin.user2.get())
 
     def ___wrapper2(self) -> None:
-        dictio = self.__AppLogin.newUser
+        dictio = self.correctInfo(self.__AppLogin.newUser)
         mensaje = "Campos incompletos"
         if self.validarLen(dictio):
             mensaje = (
@@ -43,16 +50,35 @@ class Controller:
                 if self.validarNew()
                 else "No coinciden las contraseñas"
             )
-
+        self.__AppLogin.passw.set("")
         self.__AppLogin.message(mensaje)
 
     def validarBas(self) -> str:
-        dictio = self.__AppLogin.user
-        return validar(dictio["Name"], dictio["Pass"])
+        dictio = self.correctInfo(self.__AppLogin.user)
+        return validar(dictio["Name"], dictio["Pass"], self.__AppLogin.level)
 
     def validarNew(self) -> bool:
-        dictio = self.__AppLogin.newUser
+        dictio = self.correctInfo(self.__AppLogin.newUser)
         return dictio["Pass"] == dictio["NPass"]
+
+    @staticmethod
+    def valQuery(regex: str, query:str)->bool:
+        flag = re.compile(regex)
+        return bool(flag.fullmatch(query))
+
+    
+    def correctInfo(self, karg:dict)->dict:
+        """
+        Solo consideramos letras, numeros y ._- para evitar inyecciones
+        """                
+        dictio = {}
+        for key, value in karg.items():
+            dictio[key]=value if self.valQuery('[a-zA-Z0-9._-]+', value) else ""
+
+        return dictio
+            
+
+
 
     @staticmethod
     def validarLen(karg: dict) -> bool:
@@ -68,22 +94,26 @@ class Controller:
 
 
 class Controller2:
-    def __init__(self):
+    def __init__(self, cajero_name: str):
         self.listaId = []
-        self.datos = []
+        self.datos = {}
+        self.datos2=[]
         self.RootLogin = Tk()
         self.__AppLogin = login.PointSale(parent=self.RootLogin)
+        self.__Admin = self.__AppLogin.login
+        Controller().conect(self.__Admin)
+        self.__AppLogin.lblCajero["text"]=f"Cajero: {cajero_name}"
         self.__tabla = self.__AppLogin.treeCatalogo
         self.__boleta = self.__AppLogin.treeBoleta
         self.__AppLogin.actualizar(readProductos(), self.__tabla)
         text = self.__AppLogin.textProduct
-        text.trace("w", lambda x, y, z: self.search(text.get()))
+        text.trace("w", lambda x, y, z: self.search(text.get() if Controller().valQuery('[a-zA-Z ]+',text.get()) else ""))
         self.__AppLogin.addCommandAdd(self.add)
         self.__AppLogin.addCommandCancel(self.cancel)
         self.__AppLogin.addCommandNuevo(self.addProdAlmacen)
         self.__AppLogin.addCommandVenta(self.wrapperLogis)
         self.__AppLogin.addCommandAlm(self.wrapperLogis2)
-        self.__Admin = self.__AppLogin.login
+        self.__AppLogin.addCommandBorrar(self.borrar)
         self.__Admin.accionBtnIngreso(self.permiso)
         self.__Admin.accionBtnBloq(self.bloquear)
         self.__AppLogin.mainloop()
@@ -91,11 +121,45 @@ class Controller2:
 
     def wrapperLogis(self):
         self.logistica("-")
+        self.recibo() 
         self.cancel()
 
     def wrapperLogis2(self):
         self.logistica("+")
+           
         self.cancel()
+
+    def recibo(self):
+        string=""
+        for item in self.datos:
+            for dato in self.datos[item]:
+                string+=f" {dato}"
+            string+="\n"    
+        with open(".//venta.txt","w+") as recibo:
+            recibo.write(
+    f"""
+    Teletubies SAC
+    RUC 1111111111
+
+    Nombre :{self.__AppLogin.frClient.NombreCliente.get()}
+    DNI : {self.__AppLogin.frClient.dniCliente.get()}
+
+{string}
+    {self.__AppLogin.total.get()}
+    
+    {self.__AppLogin.lblCajero["text"]}
+    Que tenga buen dia
+    """
+)
+            
+    def borrar(self):
+        print(self.__boleta.selection())
+        for index in self.__boleta.selection():
+            del self.datos[self.__boleta.item(index)["values"][2]]
+        self.__boleta.delete(self.__boleta.selection())
+        total=sum([float(self.__boleta.item(index)["values"][1]) for index in self.__boleta.get_children()])
+        self.__AppLogin.total.set(f"Total: {total}" )
+        print(self.datos)
 
     def search(self, value):
 
@@ -105,40 +169,52 @@ class Controller2:
     def add(self):
 
         cant = self.__AppLogin.cantidad.get()
+       
         if cant < 0:
             raise Exception
         for index in self.__AppLogin.getTablaSeleccion(self.__tabla):
-            self.datos.append(
-                [
+            self.datos[self.__tabla.item(index)["text"]]=[
                     self.__tabla.item(index)["values"][0],
                     cant,
                     cant * float(self.__tabla.item(index)["values"][1]),
-                ]
-            )
-            self.listaId.append([self.__tabla.item(index)["text"], cant])
+                    self.__tabla.item(index)["text"]
 
-        self.__AppLogin.borrar(self.__boleta)
-        self.__AppLogin.actualizar(self.datos, self.__boleta)
+            ]
+        self.datos2=[self.datos[value] for value in self.datos]    
+
+        self.__AppLogin.borrar(self.__boleta)  
+        self.__AppLogin.actualizar(self.datos2, self.__boleta)  
+        total=sum([float(self.__boleta.item(index)["values"][1]) for index in self.__boleta.get_children()])       
+        
+        self.__AppLogin.total.set(f"Total: {total}" )
         self.__AppLogin.cantidad.set(1)
 
     def cancel(self):
         self.__AppLogin.borrar(self.__boleta)
         self.listaId = []
-        self.datos = []
+        self.datos2 = []
+        self.datos={}
 
     def logistica(self, mode: str = "+"):
-        for item in self.listaId:
-            updateCant(item[0], item[1], mode)
+        for item in self.datos:
+            print (item)
+            print (self.datos[item])
+            updateCant(self.datos[item][3], self.datos[item][1], mode)
         self.search("")
 
     def permiso(self):
+        del self.__Admin
+        self.__Admin=self.__AppLogin.login
+        self.__Admin.message("")
+        
         mensaje = (
             self.validarBas()
             if Controller().validarLen(self.__Admin.user)
             else "Campos vacios"
         )
+        
         self.__Admin.message(mensaje)
-        if mensaje == "Ingresando":
+        if self.__Admin.labelVerif["text"] == "Ingresando":
             modif = [
                 self.__AppLogin.btnAlm,
                 self.__AppLogin.btnDevol,
@@ -154,8 +230,10 @@ class Controller2:
             for item in modif:
                 item.configure(state="normal")
 
-            self.__Admin.txtUser["text"] = ""
-        self.__Admin.txtPass["text"] = ""
+            self.__Admin.user2.set("")
+        self.__Admin.passw.set("")
+        
+        
 
     def bloquear(self):
         modif = [

@@ -1,3 +1,4 @@
+from ast import Str
 from tkinter import *
 from tkinter.font import Font
 from tkinter import ttk
@@ -10,6 +11,7 @@ class Login(Frame):
     def __init__(self, parent=None, lite=True):
         super(Login, self).__init__(parent)
         self.parentIn = parent
+        self.lite=lite
         self.__iniciar(self.parentIn, "Iniciando", lite)
 
     def __iniciar(self, parent: Tk, debuggerMessage: str, lite=True) -> None:
@@ -55,9 +57,12 @@ class Login(Frame):
             self.__lfUser, text="Usuario", font=self.fontFam1, fg=self.fg2, bg=self.bg
         )
         self.labelUser.grid(column=0, row=0, padx=self.gap, pady=self.gap)
-
+        self.user2 = StringVar()
         self.txtUser = Entry(
-            self.__lfUser, text="Ingrese su usuario", font=self.fontFam1
+            self.__lfUser,
+            text="Ingrese su usuario",
+            font=self.fontFam1,
+            textvariable=self.user2,
         )
         self.txtUser.grid(column=1, row=0, padx=self.gap, pady=self.gap)
 
@@ -69,8 +74,10 @@ class Login(Frame):
             bg=self.bg,
         )
         self.labelContra.grid(column=0, row=1, padx=self.gap, pady=self.gap)
-
-        self.txtPass = Entry(self.__lfUser, show="*", font=self.fontFam1)
+        self.passw = StringVar(None)
+        self.txtPass = Entry(
+            self.__lfUser, show="*", font=self.fontFam1, textvariable=self.passw
+        )
         self.txtPass.grid(column=1, row=1, padx=self.gap, pady=self.gap)
 
         self.labelVerif = Label(
@@ -151,13 +158,13 @@ class Login(Frame):
             self.labelUser,
             self.__lfUser,
         ]
-
+    
     @property
     def user(self) -> dict:
         """
         Getter de los datos del usuario
         """
-        return {"Name": self.txtUser.get(), "Pass": self.txtPass.get()}
+        return {"Name": self.user2.get(), "Pass": self.passw.get()}
 
     @property
     def newUser(self) -> dict:
@@ -166,6 +173,10 @@ class Login(Frame):
             "Pass": self.txtPass.get(),
             "NPass": self.__txtPass2.get(),
         }
+
+    @property
+    def level(self)->1 or 0:
+        return not self.lite
 
     def accionBtnBloq(self, accion):
         self.btnBloquear["command"] = accion
@@ -240,7 +251,7 @@ class PointSale(Frame):
         Introducimos los widgets a la ventana principal
         """
         print(debuggerMessage)
-        self.gap = 8
+        self.gap = 3
         self.bg = "#101010"
         self.fg1 = "#003566"
         self.fg2 = "#fff"
@@ -253,22 +264,25 @@ class PointSale(Frame):
         self.frVender = Frame(parent)
         self.frVender.pack(side="left", fill=BOTH)
 
+        self.lblCajero = Label(self.frVender)
+        self.lblCajero.pack(pady=self.gap)
+
         self.lblFrBuscar = LabelFrame(self.frVender, text="Buscar")
-        self.lblFrBuscar.pack()
+        self.lblFrBuscar.pack(pady=self.gap)
 
         self.lblFiltro = Label(self.lblFrBuscar, text="Filtrar")
-        self.lblFiltro.grid(column=0, row=0, sticky="w")
+        self.lblFiltro.grid(column=0, row=0, sticky="w", pady=self.gap)
 
         self.filtro = IntVar(None, 1)
         self.radioNombre = Radiobutton(
             self.lblFrBuscar, text="Nombre", variable=self.filtro, value=1
         )
-        self.radioNombre.grid(column=0, row=1, sticky="w")
+        self.radioNombre.grid(column=0, row=1, sticky="w", pady=self.gap)
 
         self.radioId = Radiobutton(
             self.lblFrBuscar, text="Codigo", variable=self.filtro, value=2
         )
-        self.radioId.grid(column=1, row=1)
+        self.radioId.grid(column=1, row=1, pady=self.gap)
 
         # self.lblProduct = Label(self.lblFrBuscar, text="Producto")
         # self.lblProduct.grid(column=0, row=0)
@@ -276,28 +290,38 @@ class PointSale(Frame):
         # self.textProduct.trace("w", lambda x, y, z:print(textProduct.get()) )
 
         self.txtProduct = Entry(self.lblFrBuscar, textvariable=self.textProduct)
-        self.txtProduct.grid(column=0, row=2, columnspan=2, sticky="we")
-
+        self.txtProduct.grid(column=0, row=2, columnspan=2, sticky="we", pady=self.gap)
+        
         self.frAdd = LabelFrame(self.frVender, text="cantidad")
-        self.frAdd.pack(expand=1)
+        self.frAdd.pack(expand=1, pady=self.gap)
 
         self.cantidad = IntVar(None, 1)
 
         self.txtAdd = Entry(self.frAdd, textvariable=self.cantidad)
-        self.txtAdd.grid(column=0, row=0)
+        self.txtAdd.grid(column=0, row=0, pady=self.gap)
 
-        self.btnAdd = Button(self.frAdd)
-        self.btnAdd.grid(column=1, row=0)
+        self.btnAdd = Button(self.frAdd, text="Add")        
+        self.btnAdd.grid(column=1, row=0, pady=self.gap)
 
-        self.treeBoleta = ttk.Treeview(self.frVender, columns=["0", "1"])
+        self.treeBoleta = ttk.Treeview(self.frVender, columns=["0", "1", "2"], displaycolumns=["0","1"])
 
         self.treeBoleta.column("#0", width=180)
         self.treeBoleta.column("#1", width=60)
         self.treeBoleta.column("#2", width=60)
         self.treeBoleta.pack(fill=Y)
 
+        self.btnBorrar=Button(self.frVender, text="Borrar")
+        self.btnBorrar.pack(expand=1)
+
+        self.total = StringVar()
+        self.lbltotal = Label(self.frVender, textvariable=self.total, text="Total")
+        self.lbltotal.pack(anchor=E, padx=self.gap)
+
+        self.frClient = Cliente(self.frVender)
+        self.frClient.pack(pady=self.gap)
+
         self.frOpciones = Frame(self.frVender)
-        self.frOpciones.pack(expand=1)
+        self.frOpciones.pack(expand=1, pady=self.gap)
 
         self.btnAceptar = Button(self.frOpciones, text="VENTA")
         self.btnAceptar.grid(column=0, row=0, sticky=W + E)
@@ -397,3 +421,28 @@ class PointSale(Frame):
 
     def addCommandAlm(self, function):
         self.btnAlm["command"] = function
+    
+    def addCommandBorrar(self, function):
+        self.btnBorrar["command"] = function
+
+
+class Cliente(Frame):
+    def __init__(self, parent=None):
+        super(Cliente, self).__init__(parent)
+        self.lblFrClient = LabelFrame(self, text="Cliente")
+        self.lblFrClient.pack()
+
+        self.lblNombreCliente = Label(self.lblFrClient, text="Nombre")
+        self.lblNombreCliente.grid(column=0, row=0)
+
+        self.NombreCliente = StringVar()
+
+        self.txtNombreCliente = Entry(self.lblFrClient, textvariable=self.NombreCliente)
+        self.txtNombreCliente.grid(column=1, row=0)
+
+        self.lblDniCliente = Label(self.lblFrClient, text="DNI")
+        self.lblDniCliente.grid(column=0, row=1)
+
+        self.dniCliente = IntVar()
+        self.txtDniCliente = Entry(self.lblFrClient, textvariable=self.dniCliente)
+        self.txtDniCliente.grid(column=1, row=1)

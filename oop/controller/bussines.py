@@ -100,8 +100,7 @@ def searchUser(name: str, level=0) -> 1 or 0:
 
     return Conexion().start(query).resultado[0][0]
 
-
-def searchUserPass(name: str, password: str, level=0):
+def searchUserPass(name: str, password: str, level=False):
     query = f"SELECT EXISTS (SELECT 1 FROM admin WHERE nombre='{name}' AND password='{password}')"
 
     if not level:
@@ -110,7 +109,7 @@ def searchUserPass(name: str, password: str, level=0):
     return Conexion().start(query).resultado[0][0]
 
 
-def validar(name: str, password: str, level=0) -> str:
+def validar(name: str, password: str, level=False) -> str:
     if searchUser(name, level):
         return (
             "Ingresando"
